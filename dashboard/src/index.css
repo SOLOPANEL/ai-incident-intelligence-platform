@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS — incident-intelligent
+   ============================================================ */
+:root {
+  /* Backgrounds */
+  --bg-app: #0a0e17;
+  --bg-card: #10141f;
+  --bg-card-hover: #141926;
+
+  /* Borders */
+  --border-subtle: #1e2433;
+  --border-strong: #2a3145;
+
+  /* Accent */
+  --accent-primary: #6f5cf5;
+  --accent-primary-hover: #7d6bff;
+  --accent-primary-12: rgba(111, 92, 245, 0.12);
+  --accent-primary-20: rgba(111, 92, 245, 0.20);
+  --accent-primary-35: rgba(111, 92, 245, 0.35);
+
+  /* Text */
+  --text-primary: #e8eaf0;
+  --text-secondary: #8b93a7;
+  --text-tertiary: #5b6478;
+
+  /* Severity */
+  --severity-critical-bg: #3a1620;
+  --severity-critical-text: #f16d8c;
+  --severity-high-bg: #3a2410;
+  --severity-high-text: #f0a458;
+  --severity-medium-bg: #362c10;
+  --severity-medium-text: #e0b84a;
+  --severity-low-bg: #12203a;
+  --severity-low-text: #6ea8f0;
+
+  /* State colors */
+  --state-open: #f16d8c;
+  --state-investigating: #f0a458;
+  --state-mitigated: #e0b84a;
+  --state-resolved: #4ade80;
+  --state-pending: #f0a458;
+
+  /* Status */
+  --success-green: #4ade80;
+
+  /* Chart lines */
+  --chart-line-detected: #6f7cf5;
+  --chart-line-resolved: #4ade80;
+
+  /* Shape */
+  --radius-card: 14px;
+  --radius-pill: 6px;
+
+  /* Fonts */
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-mono-label: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+
+  /* Transitions */
+  --transition-base: all 150ms ease-out;
+}
+
+/* ============================================================
+   GLOBAL RESET
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 100%;
+  text-align: left;
+  border: none;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+input, select {
+  font-family: var(--font-ui);
+}
+
+p {
+  margin: 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4560;
+}

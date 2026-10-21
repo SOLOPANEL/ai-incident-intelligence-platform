@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+redis
+psycopg2-binary
+pandas
+scikit-learn
+drain3
+sentence-transformers
+pgvector
+requests

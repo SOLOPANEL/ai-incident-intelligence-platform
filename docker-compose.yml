@@ -1,0 +1,126 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: incident-redis
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: incident-postgres
+    environment:
+      POSTGRES_USER: incident_user
+      POSTGRES_PASSWORD: incident_pass
+      POSTGRES_DB: incident_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - incident_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incident_user -d incident_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  consumer:
+    build: .
+    command: python redis_to_postgres_consumer.py
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+      POSTGRES_HOST: postgres
+    restart: unless-stopped
+
+  generator:
+    build: .
+    command: python fake_log_generator.py
+    depends_on:
+      redis:
+        condition: service_started
+    environment:
+      REDIS_HOST: redis
+    restart: unless-stopped
+
+  analyzer:
+    build: .
+    command: python log_analyzer.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+    restart: unless-stopped
+
+  ml_detector:
+    build: .
+    command: python ml_anomaly_detector.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+    restart: unless-stopped
+
+  explainer:
+    build: .
+    command: python incident_explainer.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      OLLAMA_HOST: host.docker.internal
+    restart: unless-stopped
+
+  triage:
+    build: .
+    command: python triage_and_alert.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
+    restart: unless-stopped
+
+  feedback:
+    build: .
+    command: python feedback_processor.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+    restart: unless-stopped
+
+  api:
+    build: .
+    command: python -m uvicorn api:app --host 0.0.0.0 --port 8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      INGEST_API_KEY: ${INGEST_API_KEY}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  incident_pg_data:
